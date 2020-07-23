@@ -168,13 +168,13 @@ def verify_two_workers_all_data_on_disk_with_shuffle(conf, sim):
     stage_0_disk_read_ms +      # Time to read the input data from disk
     stage_0_compute_ms +        # Time to execute Stage 0's compute phase
     stage_0_disk_write_ms +     # Time to write the shuffle data to disk
-    network_latency_ms)        # Time to notify the master that Stage 0's Macrotasks completed
+    network_latency_ms)        # Time to notify the main that Stage 0's Macrotasks completed
   stage_1_expected_ms = (
     network_latency_ms +        # Time to send Stage 1's Macrotasks to the Workers
     shuffle_critical_path_ms +  # Time to receive all of the shuffle data.
     stage_1_compute_ms +        # Time to execute Stage 1's compute phase
     stage_1_disk_write_ms +     # Time to write Stage 1's output data to disk
-    network_latency_ms)         # Time to notify the master that Stage 2's Macrotasks completed
+    network_latency_ms)         # Time to notify the main that Stage 2's Macrotasks completed
   expected_jct_ms = stage_0_expected_ms + stage_1_expected_ms
 
   logging.info(
@@ -250,12 +250,12 @@ def verify_two_workers_all_data_in_memory_with_shuffle(conf, sim):
   stage_0_expected_ms = (
     network_latency_ms +  # Time to send Stage 1's Macrotask to Worker
     stage_0_compute_ms +  # Time to execute Stage 1's compute phase
-    network_latency_ms)  # Time to notify master that Stage 1's Macrotask completed
+    network_latency_ms)  # Time to notify main that Stage 1's Macrotask completed
   stage_1_expected_ms = (
     network_latency_ms +  # Time to send Stage 2's Macrotask to Worker
     shuffle_ms +          # Time to receive all of the shuffle data.
     stage_1_compute_ms +  # Time to execute Stage 2's compute phase
-    network_latency_ms)   # Time to notify master that Stage 2's Macrotask completed
+    network_latency_ms)   # Time to notify main that Stage 2's Macrotask completed
   expected_jct_ms = stage_0_expected_ms + stage_1_expected_ms
 
   logging.info(

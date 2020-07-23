@@ -42,7 +42,7 @@ max_concurrent_tasks_values = [0, 2, 4, 8, 16]
 
 spark_defaults_filepath = utils.get_full_path(relative_path="spark/conf/spark-defaults.conf")
 run_example_command = utils.get_full_path(relative_path="spark/bin/run-example")
-run_on_slaves_command = utils.get_full_path(relative_path="ephemeral-hdfs/sbin/slaves.sh")
+run_on_subordinates_command = utils.get_full_path(relative_path="ephemeral-hdfs/sbin/subordinates.sh")
 
 for max_concurrent_tasks in max_concurrent_tasks_values:
   # Change the maximum number of concurrent tasks by resetting the Spark config.

@@ -24,7 +24,7 @@ import task_constructs
 class Scheduler(object):
   """A module that controls when Macrotasks are assigned to Workers.
 
-  Each Worker is paired with a Scheduler, which requests Macrotasks from the master when Monotasks
+  Each Worker is paired with a Scheduler, which requests Macrotasks from the main when Monotasks
   complete. Subclasses implement various scheduling policies.
 
   This class only implements get_scheduler_for_mode() and get_macrotask_request().
@@ -69,7 +69,7 @@ class Scheduler(object):
   def get_macrotask_request(self, current_time_ms):
     """
     Returns a new MacrotaskRequest Event for this Scheduler's Worker, scheduled for the current time
-    plus the network latency between the Worker and the master.
+    plus the network latency between the Worker and the main.
     """
     return (
       current_time_ms + self.worker.conf.network_latency_ms,
@@ -133,7 +133,7 @@ class ThrottlingScheduler(Scheduler):
 
   A Stage's resource profile is used to build a resource pipeline through which Macrotasks can be
   thought to move. The bottleneck resource applies backpressure through the pipeline to throttle
-  when Macrotasks are requested from the master node.
+  when Macrotasks are requested from the main node.
   """
 
   def __init__(self, worker):
@@ -170,7 +170,7 @@ class ThrottlingScheduler(Scheduler):
     """Constructs a linked list of Phases based on the provided Macrotask's DAG of Monotasks.
 
     The first Phase is always a FirstPhase, which handles deciding when to request Macrotasks from
-    the master node. The rest of the Phases correspond to the resources that the Macrotask (and all
+    the main node. The rest of the Phases correspond to the resources that the Macrotask (and all
     other Macrotasks from the same Stage) will use during its execution.
 
     Returns:
@@ -262,12 +262,12 @@ class ThrottlingScheduler(Scheduler):
     """
     A phase in the resource pipeline through which Macrotasks can be thought to travel while being
     executed. Used to keep track of when to throttle particular resources and when to request more
-    Macrotasks from the master node.
+    Macrotasks from the main node.
     """
 
     def __init__(self, index, macrotask_buffer_size, previous_phase, concurrency):
       self.index = index
-      # The number of extra Macrotasks that are allowed to be requested from the master node.
+      # The number of extra Macrotasks that are allowed to be requested from the main node.
       self.macrotask_buffer_size = macrotask_buffer_size
       self.previous_phase = previous_phase
       self.next_phase = None
@@ -289,7 +289,7 @@ class ThrottlingScheduler(Scheduler):
       """Registers that a Macrotask has finished this Phase.
 
       Returns:
-        True if another Macrotask should be requested from the master node, or False otherwise.
+        True if another Macrotask should be requested from the main node, or False otherwise.
       """
       self.num_finished += 1
 
@@ -331,8 +331,8 @@ class ThrottlingScheduler(Scheduler):
 
       Returns:
         Recurses until reaching a FirstPhase object, at which point the decision on whether to
-        request a Macrotask from the master node is propogated back. Returns True if a Macrotask
-        should be requested from the master node, or False otherwise.
+        request a Macrotask from the main node is propogated back. Returns True if a Macrotask
+        should be requested from the main node, or False otherwise.
       """
       task_available_to_start = self.previous_phase.num_finished > self.num_approved_to_start
       resources_available = (self.num_approved_to_start - self.num_finished) < self.concurrency
@@ -350,7 +350,7 @@ class ThrottlingScheduler(Scheduler):
   class FirstPhase(Phase):
     """
     The first Phase in the Macrotask resource pipeline, which handles pulling Macrotasks from the
-    master node. This class contains additional metadata compared to the standard Phase class, as
+    main node. This class contains additional metadata compared to the standard Phase class, as
     well as special handling for deciding when to request Macrotasks.
     """
 
@@ -362,22 +362,22 @@ class ThrottlingScheduler(Scheduler):
         previous_phase=None, concurrency=1)
       self.is_throttled = True
       self.num_approved_to_start = num_initial_macrotasks
-      self.num_requested_from_master = num_initial_macrotasks
+      self.num_requested_from_main = num_initial_macrotasks
 
     def __repr__(self):
       return (
-        ("(FirstPhase | concurrency: %s | requested from master: %s | approved to start: %s " +
+        ("(FirstPhase | concurrency: %s | requested from main: %s | approved to start: %s " +
           "| finished: %s | throttled: %s)") % (
             self.concurrency,
-            self.num_requested_from_master,
+            self.num_requested_from_main,
             self.num_approved_to_start,
             self.num_finished,
             self.is_throttled))
 
     def approve_task_to_start(self):
       self.num_approved_to_start += 1
-      if self.num_approved_to_start > self.num_requested_from_master:
-        self.num_requested_from_master += 1
+      if self.num_approved_to_start > self.num_requested_from_main:
+        self.num_requested_from_main += 1
         return True
       else:
         return False

@@ -12,10 +12,10 @@ target_total_data_gb = 600
 # end up writing data to two different blocks, which we don't handle correctly.
 hdfs_blocks_per_gb = 1024 / 105
 
-slaves = [slave_line.strip("\n") for slave_line in open("/root/spark/conf/slaves").readlines()]
-print "Running experiment assuming slaves {}".format(slaves)
+subordinates = [subordinate_line.strip("\n") for subordinate_line in open("/root/spark/conf/subordinates").readlines()]
+print "Running experiment assuming subordinates {}".format(subordinates)
 
-num_machines = len(slaves)
+num_machines = len(subordinates)
 values_per_key_values = [10]
 num_tasks = target_total_data_gb * hdfs_blocks_per_gb
 # Just do one trial for now! When experiment is properly configured, do many trials.
@@ -39,10 +39,10 @@ for cores_per_worker in cores_per_worker_values:
     print command
     subprocess.check_call(command, shell=True)
 
-    utils.copy_and_zip_all_logs(stringified_parameters, slaves)
+    utils.copy_and_zip_all_logs(stringified_parameters, subordinates)
 
     # Clear the buffer cache, to sidestep issue with machines dying.
-    subprocess.check_call("/root/ephemeral-hdfs/sbin/slaves.sh /root/spark-ec2/clear-cache.sh", shell=True)
+    subprocess.check_call("/root/ephemeral-hdfs/sbin/subordinates.sh /root/spark-ec2/clear-cache.sh", shell=True)
 
     # Delete any sorted data.
     subprocess.check_call("/root/ephemeral-hdfs/bin/hadoop dfs -rm -r ./*sorted*", shell=True)

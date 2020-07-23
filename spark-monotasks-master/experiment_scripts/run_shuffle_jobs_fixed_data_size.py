@@ -25,8 +25,8 @@ longs_per_value = 2
 num_shuffles = 1
 sortByKey = False
 cacheRdd = False
-slaves = [slave_line.strip("\n") for slave_line in open("/root/spark/conf/slaves").readlines()]
-print "Running experiment assuming slaves {}".format(slaves)
+subordinates = [subordinate_line.strip("\n") for subordinate_line in open("/root/spark/conf/subordinates").readlines()]
+print "Running experiment assuming subordinates {}".format(subordinates)
 
 for num_tasks_multiplier in num_tasks_multipliers:
   num_tasks = num_machines * cores_per_machine * num_tasks_multiplier
@@ -38,7 +38,7 @@ for num_tasks_multiplier in num_tasks_multipliers:
   print command
   subprocess.check_call(command, shell=True)
 
-  utils.copy_and_zip_all_logs(stringified_parameters, slaves)
+  utils.copy_and_zip_all_logs(stringified_parameters, subordinates)
 
   # Clear the buffer cache, to sidestep issue with machines dying.
-  subprocess.check_call("/root/ephemeral-hdfs/bin/slaves.sh /root/spark-ec2/clear-cache.sh", shell=True)
+  subprocess.check_call("/root/ephemeral-hdfs/bin/subordinates.sh /root/spark-ec2/clear-cache.sh", shell=True)

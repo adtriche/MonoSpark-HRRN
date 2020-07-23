@@ -13,10 +13,10 @@ target_total_data_gb = 10
 # end up writing data to two different blocks, which we don't handle correctly.
 hdfs_blocks_per_gb = 1024 / 105
 
-slaves = utils.get_workers()
-print "Running experiment assuming slaves %s" % slaves
+subordinates = utils.get_workers()
+print "Running experiment assuming subordinates %s" % subordinates
 
-num_machines = len(slaves)
+num_machines = len(subordinates)
 cores_per_worker = 8
 # Use a large number of values per key, so that the job spents little time computing relative
 # to the amount of time doing I/O.
@@ -43,6 +43,6 @@ command_with_args = "{} {}".format(command, args)
 print command_with_args
 subprocess.check_call(command_with_args, shell=True)
 
-utils.copy_and_zip_all_logs(stringified_parameters, slaves)
+utils.copy_and_zip_all_logs(stringified_parameters, subordinates)
 
 utils.cleanup_sort_job()

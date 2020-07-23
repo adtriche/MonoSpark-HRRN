@@ -20,8 +20,8 @@ longs_per_value = 6
 num_shuffles = 6
 sortByKey = False
 cacheRdd = False
-slaves = [slave_line.strip("\n") for slave_line in open("/root/spark/conf/slaves").readlines()]
-print "Running experiment assuming slaves %s" % slaves
+subordinates = [subordinate_line.strip("\n") for subordinate_line in open("/root/spark/conf/subordinates").readlines()]
+print "Running experiment assuming subordinates %s" % subordinates
 
 for items_per_partition in items_per_partition_values:
   for num_tasks_multiplier in num_tasks_multiplier_values:
@@ -36,7 +36,7 @@ for items_per_partition in items_per_partition_values:
     print command
     subprocess.check_call(command, shell=True)
 
-    utils.copy_and_zip_all_logs(stringified_parameters, slaves)
+    utils.copy_and_zip_all_logs(stringified_parameters, subordinates)
 	
 end = time.time()
 

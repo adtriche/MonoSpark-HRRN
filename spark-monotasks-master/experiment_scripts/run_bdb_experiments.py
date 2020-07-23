@@ -1,5 +1,5 @@
 """
-This script runs the AMPLab Big Data Benchmark on an EC2 cluster whose master it is executing on.
+This script runs the AMPLab Big Data Benchmark on an EC2 cluster whose main it is executing on.
 It assumes that the benchmark data has already been loaded onto the cluster.
 
 Run this script with the "-h" flag for usage information.
@@ -144,7 +144,7 @@ def execute_queries_for_branch(aws_key_id, aws_key, args, branch, is_first_branc
     #       check if the file exists before trying to copy it.
     execute_shell_command("cp -v {} {} ".format(jar_filepath, jar_dest_dir))
 
-  print "Copying spark-monotasks to slaves"
+  print "Copying spark-monotasks to subordinates"
   copy_dir_filepath = utils.get_full_path(path.join("spark-ec2", "copy-dir"))
   execute_shell_command("{} --delete {}".format(copy_dir_filepath, SPARK_DIR))
 
