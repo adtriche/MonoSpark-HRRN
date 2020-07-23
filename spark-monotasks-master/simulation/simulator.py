@@ -16,7 +16,7 @@
 """Contains the core logic of the Monotasks simulator.
 
 This file performs the joint duties of orchestrating the simulation by executing simulation Events
-and mimicking the Monotasks master node. Execute the command "python simulator.py -h" from the
+and mimicking the Monotasks main node. Execute the command "python simulator.py -h" from the
 containing directory for instructions on running the Monotasks simulator.
 """
 
@@ -98,7 +98,7 @@ class Simulator(object):
   """Contains the core logic of the Monotasks simulator.
 
   Performs the joint duties of orchestrating the Monotasks simulation and mimicking the functions
-  of the Monotasks master node. Processes a queue of simulation Events and distributes Macrotasks to
+  of the Monotasks main node. Processes a queue of simulation Events and distributes Macrotasks to
   several Workers.
   """
 
@@ -345,7 +345,7 @@ class Simulator(object):
       starts, or an empty list if there are no more Stages or Jobs remaining.
     """
     macrotask.worker.num_assigned_macrotasks -= 1
-    macrotask.master_knows_is_finished = True
+    macrotask.main_knows_is_finished = True
     if self.current_stage.is_finished():
       # There are no more Macrotasks in the current Stage, so it has finished. Try to start the next
       # Stage.

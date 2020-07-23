@@ -7,9 +7,9 @@ import subprocess
 
 import utils
 
-slaves = [slave_line.strip("\n") for slave_line in open("/root/spark/conf/slaves").readlines()]
-num_machines = len(slaves)
-print "Running experiment with {} slaves: {}".format(num_machines, slaves)
+subordinates = [subordinate_line.strip("\n") for subordinate_line in open("/root/spark/conf/subordinates").readlines()]
+num_machines = len(subordinates)
+print "Running experiment with {} subordinates: {}".format(num_machines, subordinates)
 
 cores_per_machine = 8
 num_disk_tasks = num_machines * 8
@@ -52,7 +52,7 @@ for num_concurrent_tasks in num_concurrent_task_values:
   print command
   subprocess.check_call(command, shell=True)
 
-  utils.copy_and_zip_all_logs(parameters, slaves)
+  utils.copy_and_zip_all_logs(parameters, subordinates)
 
   # Clear the buffer cache, to sidestep issue with machines dying.
-  subprocess.check_call("/root/ephemeral-hdfs/bin/slaves.sh /root/spark-ec2/clear-cache.sh", shell=True)
+  subprocess.check_call("/root/ephemeral-hdfs/bin/subordinates.sh /root/spark-ec2/clear-cache.sh", shell=True)

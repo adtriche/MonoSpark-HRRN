@@ -11,7 +11,7 @@ import utils
 
 
 workers = utils.get_workers()
-print "Running experiment assuming slaves {}".format(workers)
+print "Running experiment assuming subordinates {}".format(workers)
 
 num_workers = len(workers)
 items_per_value = 13

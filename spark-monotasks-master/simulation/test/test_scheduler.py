@@ -245,7 +245,7 @@ def test_throttling_scheduler_with_concurrency(tmpdir):
   verify_monotask_end(current_time_ms, scheduler, disk_monotasks[2], expect_macrotask_request=True)
   verify_monotask_end(current_time_ms, scheduler, disk_monotasks[3], expect_macrotask_request=True)
 
-  # The sixth and seventh Macrotasks are received from the master.
+  # The sixth and seventh Macrotasks are received from the main.
   scheduler.handle_macrotask_start(macrotasks[5])
   scheduler.handle_macrotask_start(macrotasks[6])
 
@@ -255,7 +255,7 @@ def test_throttling_scheduler_with_concurrency(tmpdir):
   # The sixth Macrotask finishes the disk Phase.
   verify_monotask_end(current_time_ms, scheduler, disk_monotasks[5], expect_macrotask_request=False)
 
-  # The eighth Macrotask is received from the master.
+  # The eighth Macrotask is received from the main.
   scheduler.handle_macrotask_start(macrotasks[7])
 
   # The eighth Macrotask finishes the disk Phase.
@@ -356,7 +356,7 @@ def verify_phase_pipeline_state(scheduler, expected_phase_pipeline_state):
   Args:
     scheduler: The Scheduler to check.
     expected_phase_pipeline_state: A list of the internal state values to expect. The first element
-      should be the number of Macrotasks that should have been requested from the master node. For
+      should be the number of Macrotasks that should have been requested from the main node. For
       the ith Phase in the pipeline, the expected values for its "num_finished",
       "num_approved_to_start", and "is_throttled" variables should be located at indices 3 * i + 1,
       3 * i + 2, and 3 * i + 3, respectively.
@@ -383,7 +383,7 @@ def verify_phase_pipeline_state(scheduler, expected_phase_pipeline_state):
     logging.info("Checking %s", current_phase)
 
     if i == 0:
-      assert current_phase.num_requested_from_master == expected_phase_pipeline_state[0]
+      assert current_phase.num_requested_from_main == expected_phase_pipeline_state[0]
     assert current_phase.num_finished == expected_phase_pipeline_state[3 * i + 1]
     assert current_phase.num_approved_to_start == expected_phase_pipeline_state[3 * i + 2]
     assert current_phase.is_throttled == expected_phase_pipeline_state[3 * i + 3]

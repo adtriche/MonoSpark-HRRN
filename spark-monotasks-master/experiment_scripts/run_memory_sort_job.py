@@ -14,10 +14,10 @@ import utils
 
 MEGABYTES_PER_GIGABYTE = 1024
 
-slaves = utils.get_workers()
-print "Running experiment assuming slaves %s" % slaves
+subordinates = utils.get_workers()
+print "Running experiment assuming subordinates %s" % subordinates
 
-num_machines = len(slaves)
+num_machines = len(subordinates)
 values_per_key = 8
 num_shuffles = 5
 
@@ -34,9 +34,9 @@ for num_tasks_multiplier in num_tasks_multipliers:
   stringified_parameters = ["%s" % p for p in parameters]
 
   # Clear the buffer cache, to sidestep issue with machines dying because they've run out of memory.
-  slaves_file = utils.get_full_path("spark/sbin/slaves.sh")
+  subordinates_file = utils.get_full_path("spark/sbin/subordinates.sh")
   clear_cache_file = utils.get_full_path("spark-ec2/clear-cache.sh")
-  subprocess.check_call("{} {}".format(slaves_file, clear_cache_file), shell=True)
+  subprocess.check_call("{} {}".format(subordinates_file, clear_cache_file), shell=True)
 
   # Delete any existing sorted data, to avoid naming conflicts.
   if num_shuffles > 0:
@@ -53,5 +53,5 @@ for num_tasks_multiplier in num_tasks_multipliers:
   print "Running sort job with command: ", command
   subprocess.check_call(command, shell=True)
 
-  utils.copy_and_zip_all_logs(stringified_parameters, slaves)
+  utils.copy_and_zip_all_logs(stringified_parameters, subordinates)
 

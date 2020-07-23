@@ -97,7 +97,7 @@ class Stage(object):
     Returns:
       True if all of the Macrotasks in this Stage have finished, or False otherwise.
     """
-    return all(macrotask.master_knows_is_finished for macrotask in self.macrotasks)
+    return all(macrotask.main_knows_is_finished for macrotask in self.macrotasks)
 
   def get_next_macrotask(self):
     """Retrieves the next Macrotask to execute.
@@ -191,8 +191,8 @@ class Macrotask(object):
     # The Worker to which this Macrotask has been assigned, or None if this Macrotask has not been
     # assigned to a Worker yet.
     self.worker = None
-    # Whether the master node has been notified that this Macrotask has finished.
-    self.master_knows_is_finished = False
+    # Whether the main node has been notified that this Macrotask has finished.
+    self.main_knows_is_finished = False
 
   def __repr__(self):
     return "(Macrotask | id: %s)" % self.macrotask_id

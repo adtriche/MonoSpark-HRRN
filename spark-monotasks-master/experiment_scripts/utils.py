@@ -25,8 +25,8 @@ def get_full_path(relative_path):
 
 # Returns a list of the workers in the cluster.
 def get_workers():
-  workers_filename = get_full_path("spark/conf/slaves")
-  return [slave_line.strip("\n") for slave_line in open(workers_filename).readlines()]
+  workers_filename = get_full_path("spark/conf/subordinates")
+  return [subordinate_line.strip("\n") for subordinate_line in open(workers_filename).readlines()]
 
 # Copy a file from a given host through scp, throwing an exception if scp fails.
 def scp_from(host, remote_file, local_file, identity_file=None):
@@ -54,7 +54,7 @@ def build_ssh_command(host, command, identity_file=None):
 def get_identity_file_argument(identity_file):
   return "" if (identity_file is None) else "-i {}".format(identity_file)
 
-def copy_all_logs(stringified_parameters, slaves):
+def copy_all_logs(stringified_parameters, subordinates):
   """
   Assembles all of the logs from running an experiment into a single directory, and returns the path
   to that directory.
@@ -62,7 +62,7 @@ def copy_all_logs(stringified_parameters, slaves):
   Args:
     stringified_parameters: A list of strings that were parameters to the experiment. Used
       in naming the resulting directory.
-    slaves: A list of workers used to run the experiment (the continuous monitor logs will be
+    subordinates: A list of workers used to run the experiment (the continuous monitor logs will be
       copied back from all of these machines).
   """
   # Name the directory with the logs based on the parameters, along with a timestamp.
@@ -71,16 +71,16 @@ def copy_all_logs(stringified_parameters, slaves):
   log_directory_name = "/mnt/{}".format(log_subdirectory_name)
   os.makedirs(log_directory_name)
 
-  for slave_hostname in slaves:
+  for subordinate_hostname in subordinates:
     continuous_monitor_relative_filename = ssh_get_stdout(
-      slave_hostname,
+      subordinate_hostname,
       "ls -t /tmp/ | grep continuous_monitor | head -n 1").strip("\n").strip("\r")
     continuous_monitor_filename = "/tmp/{}".format(continuous_monitor_relative_filename)
     local_continuous_monitor_file = "{}/{}_executor_monitor".format(log_directory_name,
-                                                                    slave_hostname)
+                                                                    subordinate_hostname)
     print("Copying continuous monitor from file {} on host {} back to {}".format(
-      continuous_monitor_filename, slave_hostname, local_continuous_monitor_file))
-    scp_from(slave_hostname, continuous_monitor_filename, local_continuous_monitor_file)
+      continuous_monitor_filename, subordinate_hostname, local_continuous_monitor_file))
+    scp_from(subordinate_hostname, continuous_monitor_filename, local_continuous_monitor_file)
 
   event_log_relative_filename = subprocess.Popen(
     "ls -t /tmp/spark-events | head -n 1", stdout=subprocess.PIPE, shell=True).communicate()[0]
@@ -107,16 +107,16 @@ def copy_all_logs(stringified_parameters, slaves):
   print("Finished copying results to {}".format(log_directory_name))
   return log_directory_name
 
-def copy_and_zip_all_logs(stringified_parameters, slaves):
+def copy_and_zip_all_logs(stringified_parameters, subordinates):
   """ Packages up all of the logs from running an experiment.
 
   Args:
     stringified_parameters: A list of strings that were parameters to the experiment. Used
       in naming the resulting directory.
-    slaves: A list of workers used to run the experiment (the continuous monitor logs will be
+    subordinates: A list of workers used to run the experiment (the continuous monitor logs will be
       copied back from all of these machines).
   """
-  log_subdirectory = copy_all_logs(stringified_parameters, slaves)
+  log_subdirectory = copy_all_logs(stringified_parameters, subordinates)
   log_directory = path.dirname(log_subdirectory)
 
   # Tar and zip the file so that it can easily be copied out of the cluster.
@@ -142,9 +142,9 @@ def cleanup_sort_job():
   deleting sorted data.
   """
   # Clear the buffer cache, to sidestep issue with machines dying.
-  slaves_filename = get_full_path("ephemeral-hdfs/sbin/slaves.sh")
+  subordinates_filename = get_full_path("ephemeral-hdfs/sbin/subordinates.sh")
   clear_cache_script = get_full_path("spark-ec2/clear-cache.sh")
-  subprocess.check_call("{} {}".format(slaves_filename, clear_cache_script),
+  subprocess.check_call("{} {}".format(subordinates_filename, clear_cache_script),
                         shell=True)
 
   try:

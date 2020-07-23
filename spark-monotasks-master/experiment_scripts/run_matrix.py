@@ -32,7 +32,7 @@ CORES_PER_WORKER = 8
 # Figure out the public hostname of the machine.
 get_hostname_command = "curl -s http://169.254.169.254/latest/meta-data/public-hostname"
 MASTER_HOSTNAME = subprocess.check_output(get_hostname_command, shell=True)
-print "Running job with master", MASTER_HOSTNAME
+print "Running job with main", MASTER_HOSTNAME
 
 workers = utils.get_workers()
 total_cores = len(workers) * CORES_PER_WORKER
@@ -58,12 +58,12 @@ for total_rows in total_rows_values:
     rows_per_block = int(total_rows / num_row_blocks)
     parameters = [rows_per_block, num_row_blocks, cols_per_block, num_col_blocks, num_repeats]
     stringified_parameters = [str(p) for p in parameters]
-    master_url = "spark://{}:7077".format(MASTER_HOSTNAME)
+    main_url = "spark://{}:7077".format(MASTER_HOSTNAME)
     command = ("/root/spark/bin/spark-submit --class " +
       "edu.berkeley.cs.amplab.mlmatrix.BlockCoordinateDescent --driver-memory 20G " +
       "--driver-class-path /root/ml-matrix/target/scala-2.10/mlmatrix-assembly-0.1.jar " +
       "/root/ml-matrix/target/scala-2.10/mlmatrix-assembly-0.1.jar " +
-      "{} {}".format(master_url, " ".join(stringified_parameters)))
+      "{} {}".format(main_url, " ".join(stringified_parameters)))
     print "Running job with command: " + command
     subprocess.check_call(command, shell=True)
 

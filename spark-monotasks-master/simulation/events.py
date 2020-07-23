@@ -41,7 +41,7 @@ class Event(object):
 
 
 class JobStart(Event):
-  """ Event that notifies the simulated Monotasks master node to start a new Job. """
+  """ Event that notifies the simulated Monotasks main node to start a new Job. """
 
   def __init__(self, simulator, job):
     self.simulator = simulator
@@ -56,7 +56,7 @@ class JobStart(Event):
 
 class MacrotaskRequest(Event):
   """
-  Event that notifies the Monotasks master node that a Worker requires an additional Macrotask.
+  Event that notifies the Monotasks main node that a Worker requires an additional Macrotask.
   """
 
   def __init__(self, worker):
@@ -69,11 +69,11 @@ class MacrotaskRequest(Event):
     return self.worker.simulator.send_macrotask_to_worker(current_time_ms, self.worker)
 
 
-class NotifyMasterOfMacrotaskEnd(Event):
+class NotifyMainOfMacrotaskEnd(Event):
   """
-  Event that notifies the simulated Monotasks master node that a Macrotask has completed. This logic
+  Event that notifies the simulated Monotasks main node that a Macrotask has completed. This logic
   cannot be a part of the MonotaskEnd Event because there is a network delay between when a Worker
-  finishes executing the last Monotask in a Macrotask and when the master node is told that the
+  finishes executing the last Monotask in a Macrotask and when the main node is told that the
   Macrotask has completed.
   """
 
@@ -81,7 +81,7 @@ class NotifyMasterOfMacrotaskEnd(Event):
     self.macrotask = macrotask
 
   def __repr__(self):
-    return "NotifyMasterOfMacrotaskEnd Event for %s" % self.macrotask
+    return "NotifyMainOfMacrotaskEnd Event for %s" % self.macrotask
 
   def run(self, current_time_ms):
     logging.info("%s: Macrotask completed: %s", current_time_ms, self.macrotask)
